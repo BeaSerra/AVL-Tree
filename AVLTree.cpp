@@ -1,9 +1,9 @@
 //Ana Beatriz da Silva Serra - 202304940034
 //Gabriel Ribeiro de Alcantra - 202004940012
 
-
 #include <iostream>
-#include <algorithm>  
+#include <algorithm>
+#include <stack>
 using namespace std;
 
 class AVLTree {
@@ -178,13 +178,58 @@ private:
         return node;
     }
 
-    void printInOrder(Node* node) {
-        if (node == nullptr)
+    void printTree(Node* root) {
+        if (root == nullptr) {
+            cout << "Arvore vazia\n";
             return;
+        }
 
-        printInOrder(node->left);
-        cout << node->key << " ";
-        printInOrder(node->right);
+        stack<Node*> globalStack;
+        globalStack.push(root);
+
+        int nEspacos = 32;
+        bool linhaVazia = false;
+
+        cout << endl;
+
+        while (!linhaVazia) {
+            stack<Node*> localStack;
+            linhaVazia = true;
+
+            for (int i = 0; i < nEspacos; i++)
+                cout << ' ';
+
+            while (!globalStack.empty()) {
+                Node* temp = globalStack.top();
+                globalStack.pop();
+
+                if (temp != nullptr) {
+                    cout << temp->key;
+                    localStack.push(temp->left);
+                    localStack.push(temp->right);
+
+                    if (temp->left != nullptr || temp->right != nullptr)
+                        linhaVazia = false;
+                } else {
+                    cout << "--";
+                    localStack.push(nullptr);
+                    localStack.push(nullptr);
+                }
+
+                for (int i = 0; i < nEspacos * 2 - 2; i++)
+                    cout << ' ';
+            }
+
+            cout << endl;
+            nEspacos /= 2;
+
+            while (!localStack.empty()) {
+                globalStack.push(localStack.top());
+                localStack.pop();
+            }
+        }
+
+        cout << endl;
     }
 
 public:
@@ -204,14 +249,12 @@ public:
         return search(root, key) != nullptr;
     }
 
-    void printInOrder() {
-        printInOrder(root);
-        cout << endl;
+    void printVisual() {
+        printTree(root);
     }
 };
 
 int main() {
-	
     AVLTree tree;
     int n, value;
 
@@ -225,7 +268,7 @@ int main() {
     }
 
     cout << "\nImpressao da arvore AVL:\n";
-    tree.printInOrder();
+    tree.printVisual();
 
     return 0;
 }
